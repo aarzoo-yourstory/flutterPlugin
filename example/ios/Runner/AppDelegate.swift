@@ -87,14 +87,18 @@ class CustomVideoPlayer: NSObject, FlutterPlatformView{
         channel.setMethodCallHandler({[weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
             // Note: this method is invoked on the UI thread.
             switch call.method{
+            case "loadYT":
+                self?.playerView.loadYoutubeVedio()
             case "playYT":
-                self?.playerView.playYoutubeVedio()
+                self?.playerView.playYT()
             case "stopYT":
-                self?.playerView.stopYT()
+                self?.playerView.pauseYT()
+            case "loadJW":
+                self?.playerView.loadJWVedio()
             case "playJW":
-                self?.playerView.player?.play()
+                self?.playerView.playJW()
             case "stopJW":
-                self?.playerView.player?.stop()
+                self?.playerView.player?.pause()
             default:
                 print("test default")
             }
@@ -102,7 +106,7 @@ class CustomVideoPlayer: NSObject, FlutterPlatformView{
     }
     
     func view() -> UIView {
-        return playerView.loadVideo()
+        return playerView.getVideoView()
     }
 }
 
@@ -113,12 +117,14 @@ class VideoView: NSObject, YTPlayerViewDelegate{
     let videoPlatform: String
     
     let youtubeView =  YTPlayerView()
-    let jwplayer = UIView()
+    var jwplayer = UIView()
     var player: JWPlayerController?
     
     init(frame: CGRect, viewId: Int64, argd: Any?) {
         self.frame = frame
         self.viewID = viewId
+        jwplayer.backgroundColor = .black
+        youtubeView.backgroundColor = .black
         if let argument = argd as? [String:String]{
             self.videoID = argument["videoid"] ?? ""
             self.videoPlatform = argument["platform"] ?? ""
@@ -130,20 +136,17 @@ class VideoView: NSObject, YTPlayerViewDelegate{
         jwplayer.backgroundColor = .black
     }
     
-//    func view() -> UIView {
-//        return loadVideo()
-//    }
+    //    func view() -> UIView {
+    //        return loadVideo()
+    //    }
     
-    func loadVideo() -> UIView{
+    func getVideoView() -> UIView{
         switch self.videoPlatform{
         case "jwplayer":
-            youtubeView.isHidden = true
-            playJWVedio()
             return jwplayer
         case "zoom":
             print("zoom")
         case "youtube":
-            playYoutubeVedio()
             return youtubeView
         default://youtube TODO: for zoom too.
             print("")
@@ -151,34 +154,57 @@ class VideoView: NSObject, YTPlayerViewDelegate{
         return youtubeView
     }
     
-    func playJWVedio(){
+    func loadVideo() -> UIView{
+//        playJWVedio()
+//        return jwplayer
+        switch self.videoPlatform{
+        case "jwplayer":
+            youtubeView.isHidden = true
+            loadJWVedio()
+            return jwplayer
+        case "zoom":
+            print("zoom")
+        case "youtube":
+            loadYoutubeVedio()
+            return youtubeView
+        default://youtube TODO: for zoom too.
+            print("")
+        }
+        return youtubeView
+    }
+    
+    func loadJWVedio(){
         print("in play jwplayer link: \(self.videoID)")
+//        for view in jwplayer.subviews{
+//            jwplayer.willRemoveSubview(view)
+//        }
         let config = JWConfig()
         config.file = self.videoID
         config.title = "title"
         config.displayTitle = true
         config.controls = true
-//        config.autostart = true
+        config.autostart = true
         self.player = JWPlayerController(config: config)
         if let pView = self.player?.view {
             let jwPlayerView: UIView = pView
-            jwPlayerView.tag = 999
-            jwPlayerView.frame = jwplayer.frame
-            self.jwplayer.addSubview(jwPlayerView)
-            self.jwplayer.layer.name = "JWplayer"
+//            jwPlayerView.tag = 999
+//            jwPlayerView.frame = jwplayer.frame
+            self.jwplayer = jwPlayerView//addSubview(jwPlayerView)
+//            self.jwplayer.layer.name = "JWplayer"
         }
     }
     
-    func playYoutubeVedio(){
+    func loadYoutubeVedio(){
         let playerVars = ["playsinline": 1, "autoplay": 0, "controls": 1, "iv_load_policy": 3, "modestbranding" : 1]
         youtubeView.delegate = self
         youtubeView.load(withVideoId: self.videoID, playerVars: playerVars)
         youtubeView.tag = 999
         youtubeView.layer.name = "youtubePlayer"
-        youtubeView.playVideo()
+//        youtubeView.playVideo()
     }
     
-    func resumeYT() {
+    func playYT() {
+//        loadJWVedio()
         youtubeView.playVideo()
     }
     
@@ -190,7 +216,8 @@ class VideoView: NSObject, YTPlayerViewDelegate{
         youtubeView.stopVideo()
     }
 
-    func resumeJW() {
+    func playJW() {
+//        loadJWVedio()
         player?.play()
     }
     

@@ -34,8 +34,18 @@ class BatteryLevel {
     return null;
   }
 
+  static Future<void> loadYTVideo() async{
+    await _videochannel.invokeMethod('loadYT');
+    return null;
+  }
+
   static Future<void> stopYTVideo() async{
     await _videochannel.invokeMethod('stopYT');
+    return null;
+  }
+
+  static Future<void> loadJWVideo() async{
+    await _videochannel.invokeMethod('loadJW');
     return null;
   }
 

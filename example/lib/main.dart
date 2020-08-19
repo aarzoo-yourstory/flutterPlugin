@@ -18,14 +18,20 @@ class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   static Map<String, String> jwParam = {'platform': 'jwplayer', 'videoid': "https://cdn.jwplayer.com/manifests/VNmtzuvq.m3u8"};
   static Map<String, String> ytParam = {'platform': 'youtube', 'videoid': "BHzod3UIvcE"};
-  static Map<String, String> param = jwParam;
-  UiKitView _videoPlayerView = UiKitView(viewType: 'CustomVideoPlayer',
+  static Map<String, String> param = ytParam;
+  UiKitView _ytvideoPlayerView = UiKitView(viewType: 'CustomVideoPlayer',
 //      creationParams: {'platform': 'youtube', 'videoid': "BHzod3UIvcE"},
-    creationParams: param,
+    creationParams: ytParam,
       onPlatformViewCreated: null,
       creationParamsCodec: StandardMessageCodec(),
   );
-  
+
+  UiKitView _jwvideoPlayerView = UiKitView(viewType: 'CustomVideoPlayer',
+//      creationParams: {'platform': 'youtube', 'videoid': "BHzod3UIvcE"},
+    creationParams: jwParam,
+    onPlatformViewCreated: null,
+    creationParamsCodec: StandardMessageCodec(),
+  );
   @override
   void initState() {
     super.initState();
@@ -62,7 +68,7 @@ class _MyAppState extends State<MyApp> {
         child: Center(
           child: SafeArea(
             maintainBottomViewPadding: true,
-            child: Column(
+            child: ListView(
 //            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
 
@@ -75,10 +81,16 @@ class _MyAppState extends State<MyApp> {
                 SizedBox(
                   height: 300,
                   width: 500,
-                  child: _videoPlayerView,
+                  child: _ytvideoPlayerView,
                 ),
                 Row(
                   children: <Widget>[
+                    RaisedButton(
+                      child: Text('load yt'),
+                      onPressed: (){
+                        BatteryLevel.loadYTVideo();
+                      },
+                    ),
                     RaisedButton(
                       child: Text('Play yt'),
                       onPressed: (){
@@ -93,9 +105,19 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
-
+                SizedBox(
+                  height: 300,
+                  width: 500,
+                  child: _jwvideoPlayerView,
+                ),
                 Row(
                   children: <Widget>[
+                    RaisedButton(
+                      child: Text('load yt'),
+                      onPressed: (){
+                        BatteryLevel.loadJWVideo();
+                      },
+                    ),
                     RaisedButton(
                       child: Text('Play jw'),
                       onPressed: (){
